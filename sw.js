@@ -1,7 +1,7 @@
 // Bunny Counter — Service Worker
 // Strategy: cache-first for the app shell, so it works fully offline after first load.
 
-const CACHE_NAME = 'bunny-counter-v2';
+const CACHE_NAME = 'bunny-counter-v3';
 
 const APP_SHELL = [
   './',
