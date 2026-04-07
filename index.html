@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Bunnies">
+  <meta name="theme-color" content="#1a1a2e">
+  <title>Bunny Counter</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon.svg">
+</head>
+<body>
+
+  <!-- iOS Install Banner -->
+  <div id="install-banner" class="install-banner hidden">
+    <span id="install-msg"></span>
+    <button id="install-dismiss" aria-label="Dismiss">✕</button>
+  </div>
+
+  <!-- ===== Dialog: Location Explanation ===== -->
+  <div id="dialog-location" class="dialog-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="dlg-loc-title">
+    <div class="dialog-box">
+      <div class="dialog-icon">📍</div>
+      <h2 id="dlg-loc-title" class="dialog-title">Track sighting locations?</h2>
+      <p class="dialog-body">
+        Bunny Counter can record where each rabbit was spotted so you can map your sightings later.
+        Your location is stored only on this device and never shared.
+      </p>
+      <div class="dialog-actions">
+        <button id="btn-location-ok" class="btn-primary">Enable Location</button>
+        <button id="btn-location-skip" class="btn-text">Skip for now</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Dialog: End Walk Confirmation ===== -->
+  <div id="dialog-end-walk" class="dialog-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="dlg-end-title">
+    <div class="dialog-box">
+      <h2 id="dlg-end-title" class="dialog-title">End this walk?</h2>
+      <p class="dialog-body">
+        You've spotted <strong><span id="dialog-end-count">0</span> rabbit<span id="dialog-end-plural"></span></strong> so far.
+      </p>
+      <div class="dialog-actions">
+        <button id="btn-keep-going" class="btn-primary">Keep going</button>
+        <button id="btn-confirm-end" class="btn-danger">Yes, end walk</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Screen: Home ===== -->
+  <div id="screen-home" class="screen active">
+    <div class="home-scroll">
+      <header class="home-header">
+        <div class="app-logo">🐰</div>
+        <h1 class="app-name">Bunny Counter</h1>
+        <p class="app-tagline">evening walk companion</p>
+      </header>
+
+      <main class="home-main">
+        <button id="btn-start-walk" class="btn-start">Start Walk</button>
+
+        <section class="history-section">
+          <h2 class="section-label">Past Walks</h2>
+          <div id="history-list" role="list"></div>
+          <p id="history-empty" class="empty-state" hidden>
+            No walks yet. Head outside<br>and find some rabbits! 🌙
+          </p>
+        </section>
+      </main>
+    </div>
+
+    <footer class="home-footer">
+      <button id="btn-clear-history" class="btn-clear">Clear History</button>
+    </footer>
+  </div>
+
+  <!-- ===== Screen: Active Walk ===== -->
+  <div id="screen-walk" class="screen">
+    <header class="walk-header">
+      <div class="walk-header-left">
+        <span class="walk-logo" aria-hidden="true">🐰</span>
+        <span id="walk-timer" class="walk-timer" aria-label="Elapsed time" aria-live="off">00:00</span>
+      </div>
+      <button id="btn-end-walk" class="btn-end-walk">End Walk</button>
+    </header>
+
+    <!-- The entire area below the header is one giant tap target -->
+    <button id="tap-zone" class="tap-zone" aria-label="Tap to record a rabbit sighting">
+      <div class="count-display">
+        <div id="walk-count" class="walk-count" aria-live="polite" aria-atomic="true">0</div>
+        <div class="count-label">rabbits spotted</div>
+      </div>
+      <div class="tap-cue" aria-hidden="true">
+        <span class="tap-cue-icon">🐾</span>
+        <span class="tap-cue-text">tap anywhere to count</span>
+      </div>
+    </button>
+  </div>
+
+  <!-- ===== Screen: Walk Summary ===== -->
+  <div id="screen-summary" class="screen">
+    <div class="summary-scroll">
+      <header class="summary-header">
+        <div id="summary-emoji" class="summary-emoji" aria-hidden="true">🐰</div>
+        <h1 class="summary-title">Walk Complete!</h1>
+      </header>
+
+      <main class="summary-main">
+        <div class="summary-count-block">
+          <div id="summary-count" class="summary-count">0</div>
+          <div class="summary-count-label">rabbits spotted</div>
+        </div>
+
+        <div class="details-card">
+          <div class="detail-row">
+            <span class="detail-label">Duration</span>
+            <span id="summary-duration" class="detail-value">—</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Date</span>
+            <span id="summary-date" class="detail-value">—</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Started</span>
+            <span id="summary-time" class="detail-value">—</span>
+          </div>
+        </div>
+
+        <div class="sightings-card" id="sightings-card">
+          <button id="sightings-toggle" class="sightings-toggle" aria-expanded="false">
+            <span id="sightings-toggle-text">▸ Sightings</span>
+          </button>
+          <div id="sightings-list" class="sightings-list" hidden></div>
+        </div>
+
+        <div class="summary-actions">
+          <button id="btn-save-walk" class="btn-primary">Save Walk</button>
+          <button id="btn-discard-walk" class="btn-discard">Discard Walk</button>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

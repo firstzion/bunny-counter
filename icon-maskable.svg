@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Maskable icons need the safe zone to be within the central 80% circle.
+       So we use a full bleed background and scale content inward. -->
+  <rect width="512" height="512" fill="#1a1a2e"/>
+
+  <!-- Left ear outer -->
+  <ellipse cx="196" cy="188" rx="44" ry="108" fill="#7b6be8"/>
+  <!-- Left ear inner -->
+  <ellipse cx="196" cy="188" rx="24" ry="82" fill="#c4b8ff"/>
+
+  <!-- Right ear outer -->
+  <ellipse cx="316" cy="188" rx="44" ry="108" fill="#7b6be8"/>
+  <!-- Right ear inner -->
+  <ellipse cx="316" cy="188" rx="24" ry="82" fill="#c4b8ff"/>
+
+  <!-- Body -->
+  <ellipse cx="256" cy="480" rx="120" ry="76" fill="#7b6be8"/>
+
+  <!-- Head -->
+  <circle cx="256" cy="318" r="100" fill="#9b8cf8"/>
+
+  <!-- Left eye -->
+  <circle cx="216" cy="298" r="16" fill="#1a0f30"/>
+  <circle cx="222" cy="291" r="5" fill="white" opacity="0.75"/>
+
+  <!-- Right eye -->
+  <circle cx="296" cy="298" r="16" fill="#1a0f30"/>
+  <circle cx="302" cy="291" r="5" fill="white" opacity="0.75"/>
+
+  <!-- Nose -->
+  <ellipse cx="256" cy="334" rx="9" ry="6" fill="#f090c0"/>
+
+  <!-- Cheek blush -->
+  <ellipse cx="200" cy="326" rx="18" ry="10" fill="#f090c0" opacity="0.25"/>
+  <ellipse cx="312" cy="326" rx="18" ry="10" fill="#f090c0" opacity="0.25"/>
+
+  <!-- Whiskers -->
+  <line x1="168" y1="330" x2="242" y2="337" stroke="#8070c0" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="168" y1="341" x2="242" y2="341" stroke="#8070c0" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="270" y1="337" x2="344" y2="330" stroke="#8070c0" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="270" y1="341" x2="344" y2="341" stroke="#8070c0" stroke-width="2.5" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- App icon background -->
+  <rect width="512" height="512" rx="112" fill="#1a1a2e"/>
+
+  <!-- Left ear outer -->
+  <ellipse cx="182" cy="162" rx="54" ry="136" fill="#7b6be8"/>
+  <!-- Left ear inner -->
+  <ellipse cx="182" cy="162" rx="30" ry="104" fill="#c4b8ff"/>
+
+  <!-- Right ear outer -->
+  <ellipse cx="330" cy="162" rx="54" ry="136" fill="#7b6be8"/>
+  <!-- Right ear inner -->
+  <ellipse cx="330" cy="162" rx="30" ry="104" fill="#c4b8ff"/>
+
+  <!-- Body (partially visible below head) -->
+  <ellipse cx="256" cy="470" rx="152" ry="96" fill="#7b6be8"/>
+
+  <!-- Head -->
+  <circle cx="256" cy="312" r="122" fill="#9b8cf8"/>
+
+  <!-- Left eye -->
+  <circle cx="208" cy="290" r="20" fill="#1a0f30"/>
+  <circle cx="215" cy="282" r="6" fill="white" opacity="0.75"/>
+
+  <!-- Right eye -->
+  <circle cx="304" cy="290" r="20" fill="#1a0f30"/>
+  <circle cx="311" cy="282" r="6" fill="white" opacity="0.75"/>
+
+  <!-- Nose -->
+  <ellipse cx="256" cy="330" rx="11" ry="8" fill="#f090c0"/>
+
+  <!-- Left cheek blush -->
+  <ellipse cx="190" cy="322" rx="22" ry="13" fill="#f090c0" opacity="0.25"/>
+  <!-- Right cheek blush -->
+  <ellipse cx="322" cy="322" rx="22" ry="13" fill="#f090c0" opacity="0.25"/>
+
+  <!-- Left whiskers -->
+  <line x1="155" y1="326" x2="238" y2="334" stroke="#8070c0" stroke-width="3" stroke-linecap="round"/>
+  <line x1="155" y1="338" x2="238" y2="338" stroke="#8070c0" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Right whiskers -->
+  <line x1="274" y1="334" x2="357" y2="326" stroke="#8070c0" stroke-width="3" stroke-linecap="round"/>
+  <line x1="274" y1="338" x2="357" y2="338" stroke="#8070c0" stroke-width="3" stroke-linecap="round"/>
+</svg>
