@@ -1,5 +1,8 @@
 'use strict';
 
+// ===== Version =====
+const VERSION = '1.3.0';
+
 // ===== Constants =====
 const STORAGE_KEY       = 'bunnywalks';
 const LOC_EXPLAINED_KEY = 'bunny-loc-explained';
@@ -622,6 +625,7 @@ function bindEvents() {
 
 // ===== Boot =====
 document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('app-version').textContent = `v${VERSION}`;
   renderHistory();
   bindEvents();
   registerServiceWorker();
