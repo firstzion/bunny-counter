@@ -8,6 +8,8 @@
   <meta name="apple-mobile-web-app-title" content="Bunnies">
   <meta name="theme-color" content="#1a1a2e">
   <title>Bunny Counter</title>
+  <!-- Apply saved theme before CSS renders to prevent a flash of wrong theme -->
+  <script>document.documentElement.setAttribute('data-theme',localStorage.getItem('bunny-theme')||'dark');</script>
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <link rel="manifest" href="manifest.json">
@@ -88,6 +90,7 @@
     </div>
 
     <footer class="home-footer">
+      <button id="btn-theme-toggle" class="btn-theme-toggle" aria-label="Toggle light/dark mode"></button>
       <button id="btn-clear-history" class="btn-clear">Clear History</button>
       <span id="app-version" class="app-version"></span>
     </footer>

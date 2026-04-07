@@ -1,7 +1,7 @@
 'use strict';
 
 // ===== Version =====
-const VERSION = '1.3.0';
+const VERSION = '1.4.0';
 
 // ===== Constants =====
 const STORAGE_KEY       = 'bunnywalks';
@@ -305,8 +305,9 @@ function initSightingsMap(sightings) {
     attributionControl: true,
   });
 
-  // Dark CartoDB tiles — no API key required
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  // CartoDB tiles — dark or light depending on current theme
+  const tileStyle = document.documentElement.getAttribute('data-theme') === 'light' ? 'light_all' : 'dark_all';
+  L.tileLayer(`https://{s}.basemaps.cartocdn.com/${tileStyle}/{z}/{x}/{y}{r}.png`, {
     attribution: '© <a href="https://openstreetmap.org">OSM</a> © <a href="https://carto.com">CARTO</a>',
     subdomains: 'abcd',
     maxZoom: 19,
@@ -584,6 +585,7 @@ function bindEvents() {
   // Home
   el.btnStart.addEventListener('click', handleStartTap);
   el.btnClear.addEventListener('click', clearHistory);
+  $('btn-theme-toggle').addEventListener('click', toggleTheme);
 
   // Walk (tap zone wired separately for touchstart)
   setupTapZone();
@@ -623,9 +625,24 @@ function bindEvents() {
   });
 }
 
+// ===== Theme Toggle =====
+function updateThemeButton() {
+  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  $('btn-theme-toggle').textContent = isLight ? '☾' : '☀';
+  document.querySelector('meta[name="theme-color"]').setAttribute('content', isLight ? '#f5f5f0' : '#1a1a2e');
+}
+
+function toggleTheme() {
+  const next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('bunny-theme', next);
+  updateThemeButton();
+}
+
 // ===== Boot =====
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('app-version').textContent = `v${VERSION}`;
+  updateThemeButton();
   renderHistory();
   bindEvents();
   registerServiceWorker();
