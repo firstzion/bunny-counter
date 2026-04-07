@@ -37,6 +37,20 @@
     </div>
   </div>
 
+  <!-- ===== Dialog: Generic Confirmation ===== -->
+  <!-- Reusable for Clear History, Discard Walk, etc.                -->
+  <!-- window.confirm() is silently blocked in iOS standalone mode.  -->
+  <div id="dialog-confirm" class="dialog-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="dlg-confirm-title">
+    <div class="dialog-box">
+      <h2 id="dlg-confirm-title" class="dialog-title"></h2>
+      <p id="dlg-confirm-body" class="dialog-body"></p>
+      <div class="dialog-actions">
+        <button id="dlg-confirm-ok" class="btn-danger"></button>
+        <button id="dlg-confirm-cancel" class="btn-primary">Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ===== Dialog: End Walk Confirmation ===== -->
   <div id="dialog-end-walk" class="dialog-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="dlg-end-title">
     <div class="dialog-box">

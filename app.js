@@ -58,6 +58,13 @@ const el = {
   btnSave:        $('btn-save-walk'),
   btnDiscard:     $('btn-discard-walk'),
 
+  // Generic confirm dialog
+  dlgConfirm:       $('dialog-confirm'),
+  dlgConfirmTitle:  $('dlg-confirm-title'),
+  dlgConfirmBody:   $('dlg-confirm-body'),
+  dlgConfirmOk:     $('dlg-confirm-ok'),
+  dlgConfirmCancel: $('dlg-confirm-cancel'),
+
   // Install banner
   installBanner:  $('install-banner'),
   installMsg:     $('install-msg'),
@@ -351,10 +358,16 @@ function saveWalk() {
 }
 
 function discardWalk() {
-  if (!confirm('Discard this walk? This cannot be undone.')) return;
-  pendingWalk = null;
-  clearMapInstance();
-  showScreen('home');
+  showConfirm(
+    'Discard this walk?',
+    'Your count and sighting data will not be saved.',
+    'Discard',
+    () => {
+      pendingWalk = null;
+      clearMapInstance();
+      showScreen('home');
+    }
+  );
 }
 
 // ===== History =====
@@ -371,9 +384,15 @@ function persistWalks(walks) {
 }
 
 function clearHistory() {
-  if (!confirm('Clear all walk history? This cannot be undone.')) return;
-  localStorage.removeItem(STORAGE_KEY);
-  renderHistory();
+  showConfirm(
+    'Clear history?',
+    'All past walks will be permanently deleted.',
+    'Clear All',
+    () => {
+      localStorage.removeItem(STORAGE_KEY);
+      renderHistory();
+    }
+  );
 }
 
 function renderHistory() {
@@ -458,6 +477,30 @@ function onLocationSkip() {
   localStorage.setItem(LOC_EXPLAINED_KEY, 'skipped');
   hideLocationDialog();
   beginWalk();
+}
+
+// ===== Generic Confirm Dialog =====
+// Replaces window.confirm(), which is silently blocked in iOS standalone mode.
+function showConfirm(title, body, okLabel, onConfirm) {
+  el.dlgConfirmTitle.textContent  = title;
+  el.dlgConfirmBody.textContent   = body;
+  el.dlgConfirmOk.textContent     = okLabel;
+  el.dlgConfirm.classList.remove('hidden');
+
+  function cleanup() {
+    el.dlgConfirm.classList.add('hidden');
+    el.dlgConfirmOk.removeEventListener('click', handleOk);
+    el.dlgConfirmCancel.removeEventListener('click', handleCancel);
+    el.dlgConfirm.removeEventListener('click', handleBackdrop);
+  }
+
+  function handleOk()       { cleanup(); onConfirm(); }
+  function handleCancel()   { cleanup(); }
+  function handleBackdrop(e){ if (e.target === el.dlgConfirm) cleanup(); }
+
+  el.dlgConfirmOk.addEventListener('click', handleOk);
+  el.dlgConfirmCancel.addEventListener('click', handleCancel);
+  el.dlgConfirm.addEventListener('click', handleBackdrop);
 }
 
 // ===== Helpers =====
