@@ -506,9 +506,18 @@ function setupTapZone() {
 
 // ===== PWA: Service Worker =====
 function registerServiceWorker() {
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js').catch(() => {});
-  }
+  if (!('serviceWorker' in navigator)) return;
+
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
+
+  // When the service worker sends SW_UPDATED (a new version just activated),
+  // reload the page — but only if there's no walk currently in progress,
+  // since a reload would lose unsaved count data.
+  navigator.serviceWorker.addEventListener('message', event => {
+    if (event.data?.type !== 'SW_UPDATED') return;
+    if (activeWalk) return; // don't interrupt a walk mid-count
+    window.location.reload();
+  });
 }
 
 // ===== PWA: Install Prompt (iOS) =====
