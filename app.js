@@ -8,6 +8,9 @@ const INSTALL_DISMISSED = 'bunny-install-dismissed';
 // ===== DOM helpers =====
 const $ = id => document.getElementById(id);
 
+// ===== Map state =====
+let sightingsMap = null; // active Leaflet instance
+
 // ===== DOM refs =====
 const screens = {
   home:    $('screen-home'),
@@ -46,6 +49,8 @@ const el = {
   summaryDuration:$('summary-duration'),
   summaryDate:    $('summary-date'),
   summaryTime:    $('summary-time'),
+  mapCard:        $('map-card'),
+  sightingsMapEl: $('sightings-map'),
   sightingsCard:  $('sightings-card'),
   sightingsToggle:$('sightings-toggle'),
   sightingsToggleTxt: $('sightings-toggle-text'),
@@ -243,6 +248,14 @@ function renderSummary() {
 
   // Hide the sightings card entirely if there were no taps at all
   el.sightingsCard.hidden = n === 0;
+
+  // Map — give any in-flight geolocation calls ~1s to resolve before rendering
+  el.mapCard.hidden = true;
+  clearMapInstance();
+  const mappable = w.sightings.filter(s => s.lat != null && s.lng != null);
+  if (mappable.length > 0) {
+    setTimeout(() => initSightingsMap(w.sightings), 900);
+  }
 }
 
 function toggleSightings() {
@@ -254,6 +267,77 @@ function toggleSightings() {
   el.sightingsToggleTxt.textContent = `${arrow} Sightings (${n})`;
 }
 
+// ===== Sightings Map =====
+function clearMapInstance() {
+  if (sightingsMap) {
+    sightingsMap.remove();
+    sightingsMap = null;
+  }
+}
+
+function initSightingsMap(sightings) {
+  // Leaflet might not be available offline
+  if (typeof L === 'undefined') return;
+
+  const pins = sightings
+    .map((s, i) => ({ s, i }))
+    .filter(({ s }) => s.lat != null && s.lng != null);
+
+  if (pins.length === 0) return;
+
+  el.mapCard.hidden = false;
+
+  // Destroy any previous instance before re-initialising
+  clearMapInstance();
+
+  sightingsMap = L.map('sightings-map', {
+    zoomControl: true,
+    attributionControl: true,
+  });
+
+  // Dark CartoDB tiles — no API key required
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution: '© <a href="https://openstreetmap.org">OSM</a> © <a href="https://carto.com">CARTO</a>',
+    subdomains: 'abcd',
+    maxZoom: 19,
+  }).addTo(sightingsMap);
+
+  const bounds = [];
+
+  pins.forEach(({ s, i }) => {
+    const num = i + 1; // 1-based sighting number
+
+    // Amber numbered circle marker
+    const icon = L.divIcon({
+      html: `<div class="map-pin">${num}</div>`,
+      className: '',        // must be empty string — Leaflet adds its own class otherwise
+      iconSize:   [28, 28],
+      iconAnchor: [14, 14],
+      popupAnchor:[0, -16],
+    });
+
+    const time = new Date(s.timestamp).toLocaleTimeString('en-US', {
+      hour: 'numeric', minute: '2-digit', second: '2-digit',
+    });
+
+    L.marker([s.lat, s.lng], { icon })
+      .bindPopup(`
+        <div class="map-popup-num">Sighting #${num}</div>
+        <div class="map-popup-time">${time}</div>
+      `, { maxWidth: 160 })
+      .addTo(sightingsMap);
+
+    bounds.push([s.lat, s.lng]);
+  });
+
+  // Fit the map to show all pins, with generous padding
+  if (bounds.length === 1) {
+    sightingsMap.setView(bounds[0], 16);
+  } else {
+    sightingsMap.fitBounds(bounds, { padding: [40, 40], maxZoom: 17 });
+  }
+}
+
 // ===== Save / Discard =====
 function saveWalk() {
   if (!pendingWalk) return;
@@ -261,6 +345,7 @@ function saveWalk() {
   walks.unshift(pendingWalk);
   persistWalks(walks);
   pendingWalk = null;
+  clearMapInstance();
   renderHistory();
   showScreen('home');
 }
@@ -268,6 +353,7 @@ function saveWalk() {
 function discardWalk() {
   if (!confirm('Discard this walk? This cannot be undone.')) return;
   pendingWalk = null;
+  clearMapInstance();
   showScreen('home');
 }
 

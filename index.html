@@ -9,6 +9,7 @@
   <meta name="theme-color" content="#1a1a2e">
   <title>Bunny Counter</title>
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon.svg">
 </head>
@@ -114,6 +115,12 @@
           <div class="summary-count-label">rabbits spotted</div>
         </div>
 
+        <!-- Sightings map — only shown when walk has location data -->
+        <div id="map-card" class="map-card" hidden>
+          <div id="sightings-map" class="sightings-map"></div>
+          <p class="map-caption">tap a pin to see sighting details</p>
+        </div>
+
         <div class="details-card">
           <div class="detail-row">
             <span class="detail-label">Duration</span>
@@ -144,6 +151,7 @@
     </div>
   </div>
 
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
