@@ -12,10 +12,37 @@
   <script>document.documentElement.setAttribute('data-theme',localStorage.getItem('bunny-theme')||'dark');</script>
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon.svg">
 </head>
 <body>
+
+  <!-- ===== Login Overlay ===== -->
+  <div id="overlay-login" class="overlay-login hidden" role="dialog" aria-modal="true" aria-labelledby="login-title">
+    <div class="login-container">
+      <div class="login-logo" aria-hidden="true">🐰</div>
+      <h1 id="login-title" class="login-title">Bunny Counter</h1>
+      <p class="login-desc">Sign in to sync your walks across devices</p>
+
+      <div id="login-form" class="login-form">
+        <input id="login-email" type="email" class="login-email-input"
+               placeholder="your@email.com" autocomplete="email" autocapitalize="none"
+               aria-label="Email address">
+        <button id="btn-send-magic-link" class="btn-primary">Send Magic Link</button>
+        <p class="login-hint">We'll email you a link — no password needed.</p>
+        <p id="login-error-msg" class="login-error" hidden></p>
+      </div>
+
+      <div id="login-sent-msg" class="login-sent" hidden>
+        <div class="login-sent-icon" aria-hidden="true">📬</div>
+        <p class="login-sent-text">Check your email for a magic link to sign in.</p>
+        <p class="login-sent-sub">You can close this tab and return after clicking the link.</p>
+      </div>
+
+      <button id="btn-continue-without-signin" class="btn-skip-auth">Continue without signing in</button>
+    </div>
+  </div>
 
   <!-- iOS Install Banner -->
   <div id="install-banner" class="install-banner hidden">
@@ -35,6 +62,21 @@
       <div class="dialog-actions">
         <button id="btn-location-ok" class="btn-primary">Enable Location</button>
         <button id="btn-location-skip" class="btn-text">Skip for now</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Dialog: Migration Prompt ===== -->
+  <div id="dialog-migration" class="dialog-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="dlg-migration-title">
+    <div class="dialog-box">
+      <div class="dialog-icon">☁️</div>
+      <h2 id="dlg-migration-title" class="dialog-title">Sync local walks?</h2>
+      <p class="dialog-body">
+        You have <strong><span id="migration-walk-count">0</span> walk<span id="migration-walk-plural"></span></strong> saved locally. Would you like to sync them to your account?
+      </p>
+      <div class="dialog-actions">
+        <button id="btn-migration-sync" class="btn-primary">Sync Now</button>
+        <button id="btn-migration-skip" class="btn-text">Skip</button>
       </div>
     </div>
   </div>
@@ -69,6 +111,18 @@
 
   <!-- ===== Screen: Home ===== -->
   <div id="screen-home" class="screen active">
+
+    <!-- Account indicator — absolute-positioned over the header; shown only when authenticated -->
+    <div id="account-indicator" class="account-indicator" hidden>
+      <button id="btn-account" class="account-btn" aria-label="Account menu">
+        <span id="account-email" class="account-email"></span>
+        <span class="account-chevron" aria-hidden="true">›</span>
+      </button>
+      <div id="account-dropdown" class="account-dropdown" hidden role="menu">
+        <button id="btn-sign-out" class="account-signout" role="menuitem">Sign Out</button>
+      </div>
+    </div>
+
     <div class="home-scroll">
       <header class="home-header">
         <div class="app-logo">🐰</div>
@@ -92,7 +146,10 @@
     <footer class="home-footer">
       <button id="btn-theme-toggle" class="btn-theme-toggle" aria-label="Toggle light/dark mode"></button>
       <button id="btn-clear-history" class="btn-clear">Clear History</button>
-      <span id="app-version" class="app-version"></span>
+      <div class="footer-end">
+        <button id="btn-sign-in-footer" class="btn-sign-in-footer" hidden>Sign In</button>
+        <span id="app-version" class="app-version"></span>
+      </div>
     </footer>
   </div>
 
@@ -170,6 +227,9 @@
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="config.js"></script>
+  <script src="auth.js"></script>
+  <script src="sync.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

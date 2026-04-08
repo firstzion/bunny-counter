@@ -1,7 +1,7 @@
 'use strict';
 
 // ===== Version =====
-const VERSION = '1.4.0';
+const VERSION = '1.5.0';
 
 // ===== Constants =====
 const STORAGE_KEY       = 'bunnywalks';
@@ -352,13 +352,24 @@ function initSightingsMap(sightings) {
 // ===== Save / Discard =====
 function saveWalk() {
   if (!pendingWalk) return;
+
+  // Mark as unsynced before persisting
+  pendingWalk.synced = false;
+
   const walks = loadWalks();
   walks.unshift(pendingWalk);
   persistWalks(walks);
+
+  // Fire-and-forget sync; re-render on success to update the sync indicator
+  const walkToSync = { ...pendingWalk };
   pendingWalk = null;
   clearMapInstance();
   renderHistory();
   showScreen('home');
+
+  if (currentUser) {
+    syncWalk(walkToSync).then(success => { if (success) renderHistory(); });
+  }
 }
 
 function discardWalk() {
@@ -416,6 +427,10 @@ function renderHistory() {
     const rabbits = w.count === 0 ? '🌙'
       : '🐰'.repeat(Math.min(w.count, 3));
 
+    const syncDot = currentUser
+      ? `<span class="sync-dot ${w.synced ? 'synced' : 'local'}" aria-label="${w.synced ? 'Synced to cloud' : 'Local only'}"></span>`
+      : '';
+
     return `
       <div class="walk-card" role="listitem">
         <button class="walk-card-header" aria-expanded="false" onclick="toggleWalkCard(this)">
@@ -424,6 +439,7 @@ function renderHistory() {
             <span class="walk-card-stats">${countLabel} · ${dur}</span>
           </div>
           <div class="walk-card-right">
+            ${syncDot}
             <span class="walk-card-rabbits" aria-hidden="true">${rabbits}</span>
             <span class="walk-card-chevron" aria-hidden="true">›</span>
           </div>
@@ -611,6 +627,10 @@ function bindEvents() {
   el.btnSave.addEventListener('click', saveWalk);
   el.btnDiscard.addEventListener('click', discardWalk);
 
+  // Migration dialog
+  document.getElementById('btn-migration-sync').addEventListener('click', doMigration);
+  document.getElementById('btn-migration-skip').addEventListener('click', skipMigration);
+
   // Install banner
   el.installDismiss.addEventListener('click', () => {
     el.installBanner.classList.add('hidden');
@@ -647,4 +667,14 @@ document.addEventListener('DOMContentLoaded', () => {
   bindEvents();
   registerServiceWorker();
   setupInstallPrompt();
+  // Auth — only runs when Supabase is configured with real credentials
+  if (supabaseClient) {
+    setupAuthUI();
+    initAuth(async () => {
+      await fetchAndMergeHistory();
+      renderHistory();
+      syncPendingWalks(); // fire and forget
+      checkMigration();
+    });
+  }
 });

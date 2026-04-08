@@ -473,8 +473,6 @@ button {
   font-size: 11px;
   color: var(--text-dim);
   letter-spacing: 0.5px;
-  position: absolute;
-  right: 20px;
 }
 
 .btn-clear {
@@ -846,3 +844,251 @@ button {
 }
 
 .btn-discard:active { color: var(--danger); }
+
+/* ============================================================
+   LOGIN OVERLAY
+   ============================================================ */
+.overlay-login {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 24px;
+  padding-top: calc(var(--safe-top) + 32px);
+  padding-bottom: calc(var(--safe-bottom) + 32px);
+  overflow-y: auto;
+}
+
+.overlay-login.hidden { display: none; }
+
+.login-container {
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+.login-logo {
+  font-size: 64px;
+  line-height: 1;
+  margin-bottom: 16px;
+  filter: drop-shadow(0 0 24px var(--accent-glow));
+}
+
+.login-title {
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.login-desc {
+  font-size: 15px;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.5;
+  margin-bottom: 36px;
+}
+
+.login-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.login-email-input {
+  width: 100%;
+  padding: 16px 18px;
+  background: var(--bg-elevated);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text);
+  font-size: 17px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.login-email-input::placeholder { color: var(--text-dim); }
+
+.login-email-input:focus {
+  border-color: var(--accent);
+}
+
+.login-hint {
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.4;
+}
+
+.login-error {
+  text-align: center;
+  font-size: 14px;
+  color: var(--danger);
+  line-height: 1.4;
+}
+
+.login-sent {
+  width: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.login-sent-icon {
+  font-size: 52px;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.login-sent-text {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.login-sent-sub {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.btn-skip-auth {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 14px;
+  padding: 12px 16px;
+  margin-top: 20px;
+  border-radius: var(--radius-sm);
+  transition: color 0.15s;
+  cursor: pointer;
+}
+
+.btn-skip-auth:active { color: var(--text-muted); }
+
+/* ============================================================
+   ACCOUNT INDICATOR
+   ============================================================ */
+.account-indicator {
+  position: absolute;
+  top: calc(var(--safe-top) + 14px);
+  right: 16px;
+  z-index: 10;
+}
+
+.account-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 6px 12px 6px 10px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 500;
+  transition: background 0.15s, color 0.15s;
+  max-width: 180px;
+}
+
+.account-btn:active {
+  background: var(--bg-card);
+  color: var(--text);
+}
+
+.account-email {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-chevron {
+  font-size: 14px;
+  color: var(--text-dim);
+  flex-shrink: 0;
+  transition: transform 0.2s;
+}
+
+.account-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  min-width: 130px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.account-signout {
+  display: block;
+  width: 100%;
+  padding: 14px 18px;
+  background: none;
+  border: none;
+  color: var(--danger);
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+  transition: background 0.1s;
+}
+
+.account-signout:active { background: var(--danger-muted); }
+
+/* ============================================================
+   SYNC STATUS DOTS  (walk history cards)
+   ============================================================ */
+.sync-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.sync-dot.synced {
+  background: rgba(34, 197, 94, 0.55);  /* soft green */
+}
+
+.sync-dot.local {
+  background: var(--text-dim);
+  opacity: 0.5;
+}
+
+/* ============================================================
+   FOOTER AUTH AREA
+   ============================================================ */
+.footer-end {
+  position: absolute;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+}
+
+.btn-sign-in-footer {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 4px 0;
+  cursor: pointer;
+  opacity: 0.85;
+  transition: opacity 0.15s;
+}
+
+.btn-sign-in-footer:active { opacity: 1; }
