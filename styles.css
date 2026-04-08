@@ -1072,6 +1072,34 @@ button {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
 
+.account-menu-item {
+  display: block;
+  width: 100%;
+  padding: 14px 18px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+  transition: background 0.1s;
+}
+
+.account-menu-item:active { background: var(--bg-card); color: var(--text); }
+
+.account-delete {
+  color: var(--danger);
+  opacity: 0.8;
+}
+
+.account-delete:active { background: var(--danger-muted); opacity: 1; }
+
+.account-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 0;
+}
+
 .account-signout {
   display: block;
   width: 100%;
@@ -1131,3 +1159,187 @@ button {
 }
 
 .btn-sign-in-footer:active { opacity: 1; }
+
+/* ============================================================
+   LOGIN — PRIVACY LINK
+   ============================================================ */
+.btn-legal-link {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 12px;
+  padding: 8px 16px;
+  margin-top: 4px;
+  border-radius: var(--radius-sm);
+  transition: color 0.15s;
+  cursor: pointer;
+  letter-spacing: 0.3px;
+}
+
+.btn-legal-link:active { color: var(--text-muted); }
+
+/* ============================================================
+   LEGAL MODAL
+   ============================================================ */
+.modal-legal {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  padding-top: var(--safe-top);
+  padding-bottom: var(--safe-bottom);
+}
+
+.modal-legal.hidden { display: none; }
+
+.modal-legal-inner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.modal-legal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.btn-legal-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 18px;
+  line-height: 1;
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  transition: color 0.15s;
+  cursor: pointer;
+  min-width: 36px;
+}
+
+.btn-legal-close:active { color: var(--text); }
+
+.modal-legal-title {
+  font-size: 17px;
+  font-weight: 700;
+  text-align: center;
+  flex: 1;
+}
+
+.modal-legal-header-spacer {
+  min-width: 36px; /* mirrors close button width for centering */
+}
+
+.modal-legal-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.modal-tab {
+  flex: 1;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 14px 8px;
+  position: relative;
+  transition: color 0.15s;
+  cursor: pointer;
+}
+
+.modal-tab::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 10%;
+  right: 10%;
+  height: 2px;
+  background: var(--accent);
+  border-radius: 2px 2px 0 0;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.modal-tab.active {
+  color: var(--text);
+}
+
+.modal-tab.active::after {
+  opacity: 1;
+}
+
+.modal-legal-content {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 24px 20px 40px;
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.65;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+/* Markdown element styling within legal content */
+.modal-legal-content h1 {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  margin: 0 0 20px;
+}
+
+.modal-legal-content h2 {
+  font-size: 17px;
+  font-weight: 700;
+  margin: 28px 0 10px;
+  color: var(--text);
+}
+
+.modal-legal-content p {
+  margin: 0 0 14px;
+  color: var(--text-muted);
+}
+
+.modal-legal-content ul,
+.modal-legal-content ol {
+  padding-left: 20px;
+  margin: 0 0 14px;
+  color: var(--text-muted);
+}
+
+.modal-legal-content li {
+  margin-bottom: 6px;
+}
+
+.modal-legal-content strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.modal-legal-content a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.modal-legal-content a:active {
+  opacity: 0.7;
+}
+
+.modal-legal-content hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 24px 0;
+}
+
+.modal-legal-content em {
+  color: var(--text-dim);
+  font-style: italic;
+}

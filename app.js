@@ -1,7 +1,7 @@
 'use strict';
 
 // ===== Version =====
-const VERSION = '1.6.0';
+const VERSION = '1.7.0';
 
 // ===== Constants =====
 const STORAGE_KEY       = 'bunnywalks';
@@ -622,6 +622,28 @@ function showConfirm(title, body, okLabel, onConfirm) {
 
   el.dlgConfirmOk.addEventListener('click', handleOk);
   el.dlgConfirmCancel.addEventListener('click', handleCancel);
+  el.dlgConfirm.addEventListener('click', handleBackdrop);
+}
+
+// ===== Info Dialog (dismiss-only, supports innerHTML body) =====
+function showInfo(title, bodyHtml) {
+  el.dlgConfirmTitle.textContent = title;
+  el.dlgConfirmBody.innerHTML    = bodyHtml;
+  el.dlgConfirmOk.hidden         = true;
+  el.dlgConfirmCancel.textContent = 'OK';
+  el.dlgConfirm.classList.remove('hidden');
+
+  function cleanup() {
+    el.dlgConfirm.classList.add('hidden');
+    el.dlgConfirmOk.hidden          = false;
+    el.dlgConfirmCancel.textContent = 'Cancel';
+    el.dlgConfirmCancel.removeEventListener('click', handleDismiss);
+    el.dlgConfirm.removeEventListener('click', handleBackdrop);
+  }
+  function handleDismiss()   { cleanup(); }
+  function handleBackdrop(e) { if (e.target === el.dlgConfirm) cleanup(); }
+
+  el.dlgConfirmCancel.addEventListener('click', handleDismiss);
   el.dlgConfirm.addEventListener('click', handleBackdrop);
 }
 

@@ -82,6 +82,98 @@ function updateSignInFooterBtn() {
   btn.hidden = !(!currentUser && localStorage.getItem(SKIP_AUTH_KEY));
 }
 
+// ===== Legal Documents =====
+let _legalPrivacy = null;
+let _legalTerms   = null;
+
+function parseRtfToMarkdown(rtf) {
+  // Content starts after the last \cf0 control word
+  const startMarker = '\\cf0 ';
+  const idx = rtf.lastIndexOf(startMarker);
+  if (idx === -1) return rtf;
+  let text = rtf.slice(idx + startMarker.length);
+  text = text.replace(/\s*\}$/, '');   // remove trailing RTF closing brace
+  text = text.replace(/\\\n/g, '\n');  // RTF hard line breaks → real newlines
+  return text.trim();
+}
+
+async function loadLegalContent() {
+  if (_legalPrivacy !== null) return; // already loaded
+  try {
+    const [pr, tr] = await Promise.all([
+      fetch('./privacy-policy.rtf').then(r => r.text()),
+      fetch('./terms-of-service.rtf').then(r => r.text()),
+    ]);
+    _legalPrivacy = parseRtfToMarkdown(pr);
+    _legalTerms   = parseRtfToMarkdown(tr);
+  } catch {
+    _legalPrivacy = '# Privacy Policy\n\nFailed to load content. Please try again.';
+    _legalTerms   = '# Terms & Conditions\n\nFailed to load content. Please try again.';
+  }
+}
+
+function renderMarkdown(text) {
+  if (typeof marked !== 'undefined') return marked.parse(text);
+  // Plain-text fallback if marked.js didn't load
+  return '<pre style="white-space:pre-wrap;font-family:inherit">' +
+    text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</pre>';
+}
+
+function showLegalModal(initialTab) {
+  document.getElementById('modal-legal').classList.remove('hidden');
+  loadLegalContent().then(() => switchLegalTab(initialTab || 'privacy'));
+}
+
+function hideLegalModal() {
+  document.getElementById('modal-legal').classList.add('hidden');
+}
+
+function switchLegalTab(tab) {
+  const content = tab === 'terms' ? _legalTerms : _legalPrivacy;
+  const el = document.getElementById('legal-content');
+  el.innerHTML = renderMarkdown(content || '');
+  el.scrollTop = 0;
+  document.querySelectorAll('.modal-tab').forEach(btn => {
+    const active = btn.dataset.tab === tab;
+    btn.classList.toggle('active', active);
+    btn.setAttribute('aria-selected', String(active));
+  });
+}
+
+// ===== Delete Account =====
+async function deleteAccount() {
+  if (!currentUser) return;
+  // showConfirm is defined in app.js (same global scope)
+  showConfirm(
+    'Delete My Account?',
+    'This will permanently delete all your walks, sightings, and account data. This cannot be undone.',
+    'Permanently Delete',
+    async () => {
+      try {
+        // RPC deletes sightings, walks, and the auth.users record
+        const { error } = await supabaseClient.rpc('delete_user');
+        if (error) throw error;
+
+        // Wipe all local state
+        localStorage.clear();
+
+        // Clear session state (best-effort — user record is already gone)
+        try { await supabaseClient.auth.signOut(); } catch { /* ignore */ }
+
+      } catch (err) {
+        console.error('[auth] delete account failed:', err);
+        if (typeof showInfo === 'function') {
+          showInfo(
+            'Deletion Failed',
+            'Something went wrong deleting your account. Please try again or contact us at ' +
+            '<a href="mailto:thefirstzion@gmail.com">thefirstzion@gmail.com</a>.'
+          );
+        }
+      }
+    }
+  );
+}
+
 // ===== Wire up login form and account controls =====
 function setupAuthUI() {
   // --- Login form ---
@@ -130,6 +222,11 @@ function setupAuthUI() {
     showLoginOverlay();
   });
 
+  // Privacy & Terms from login screen (accessible before auth)
+  document.getElementById('btn-privacy-terms-login').addEventListener('click', () => {
+    showLegalModal('privacy');
+  });
+
   // --- Account indicator dropdown ---
   const indicator  = document.getElementById('account-indicator');
   const dropdown   = document.getElementById('account-dropdown');
@@ -140,6 +237,18 @@ function setupAuthUI() {
     dropdown.hidden = !dropdown.hidden;
   });
 
+  // Privacy & Terms from account dropdown
+  document.getElementById('btn-privacy-terms').addEventListener('click', () => {
+    dropdown.hidden = true;
+    showLegalModal('privacy');
+  });
+
+  // Delete My Account from account dropdown
+  document.getElementById('btn-delete-account').addEventListener('click', () => {
+    dropdown.hidden = true;
+    deleteAccount();
+  });
+
   signOutBtn.addEventListener('click', async () => {
     dropdown.hidden = true;
     await signOut();
@@ -148,5 +257,13 @@ function setupAuthUI() {
   // Close dropdown on any outside tap
   document.addEventListener('click', () => {
     if (dropdown) dropdown.hidden = true;
+  });
+
+  // --- Legal modal ---
+  document.getElementById('btn-legal-close').addEventListener('click', hideLegalModal);
+  document.getElementById('tab-privacy').addEventListener('click', () => switchLegalTab('privacy'));
+  document.getElementById('tab-terms').addEventListener('click', () => switchLegalTab('terms'));
+  document.getElementById('modal-legal').addEventListener('click', e => {
+    if (e.target === document.getElementById('modal-legal')) hideLegalModal();
   });
 }

@@ -1,4 +1,4 @@
-// Bunny Counter — Service Worker v5
+// Bunny Counter — Service Worker v6
 //
 // Strategy: network-first with offline fallback.
 //
@@ -8,7 +8,7 @@
 //   always tries to fetch the latest files when online, falls back to the cache
 //   only when there's no network. This makes deployments instant.
 
-const CACHE_NAME = 'bunny-counter-v5';
+const CACHE_NAME = 'bunny-counter-v6';
 
 const APP_SHELL = [
   './',
@@ -21,6 +21,8 @@ const APP_SHELL = [
   './manifest.json',
   './icon.svg',
   './icon-maskable.svg',
+  './privacy-policy.rtf',
+  './terms-of-service.rtf',
 ];
 
 // ─── Install: pre-cache the app shell for offline use ───────────────────────

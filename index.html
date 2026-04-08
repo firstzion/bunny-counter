@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon.svg">
 </head>
@@ -41,6 +42,7 @@
       </div>
 
       <button id="btn-continue-without-signin" class="btn-skip-auth">Continue without signing in</button>
+      <button id="btn-privacy-terms-login" class="btn-legal-link">Privacy &amp; Terms</button>
     </div>
   </div>
 
@@ -119,6 +121,9 @@
         <span class="account-chevron" aria-hidden="true">›</span>
       </button>
       <div id="account-dropdown" class="account-dropdown" hidden role="menu">
+        <button id="btn-privacy-terms" class="account-menu-item" role="menuitem">Privacy &amp; Terms</button>
+        <button id="btn-delete-account" class="account-menu-item account-delete" role="menuitem">Delete My Account</button>
+        <div class="account-divider"></div>
         <button id="btn-sign-out" class="account-signout" role="menuitem">Sign Out</button>
       </div>
     </div>
@@ -223,6 +228,22 @@
           <button id="btn-discard-walk" class="btn-discard">Discard Walk</button>
         </div>
       </main>
+    </div>
+  </div>
+
+  <!-- ===== Legal Modal ===== -->
+  <div id="modal-legal" class="modal-legal hidden" role="dialog" aria-modal="true" aria-label="Privacy &amp; Terms">
+    <div class="modal-legal-inner">
+      <header class="modal-legal-header">
+        <button id="btn-legal-close" class="btn-legal-close" aria-label="Close">✕</button>
+        <h2 class="modal-legal-title">Privacy &amp; Terms</h2>
+        <div class="modal-legal-header-spacer"></div>
+      </header>
+      <div class="modal-legal-tabs" role="tablist">
+        <button id="tab-privacy" class="modal-tab active" role="tab" aria-selected="true" data-tab="privacy">Privacy Policy</button>
+        <button id="tab-terms" class="modal-tab" role="tab" aria-selected="false" data-tab="terms">Terms &amp; Conditions</button>
+      </div>
+      <div id="legal-content" class="modal-legal-content"></div>
     </div>
   </div>
 
