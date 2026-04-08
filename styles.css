@@ -447,6 +447,45 @@ button {
   font-style: italic;
 }
 
+/* History card map */
+.history-map-wrap {
+  border-bottom: 1px solid var(--border);
+}
+
+.history-map {
+  height: 220px;
+  width: 100%;
+  background: #0d0d1a;
+}
+
+[data-theme="light"] .history-map {
+  background: #e8e8e2;
+}
+
+/* History card delete button */
+.walk-card-delete {
+  display: flex;
+  justify-content: center;
+  padding: 8px 18px 12px;
+  border-top: 1px solid var(--border);
+}
+
+.btn-delete-walk {
+  background: none;
+  border: none;
+  color: var(--danger);
+  font-size: 13px;
+  padding: 6px 20px;
+  border-radius: var(--radius-sm);
+  opacity: 0.6;
+  transition: opacity 0.15s;
+  cursor: pointer;
+}
+
+.btn-delete-walk:active {
+  opacity: 1;
+}
+
 .empty-state {
   text-align: center;
   color: var(--text-muted);

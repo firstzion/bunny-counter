@@ -1,7 +1,7 @@
 'use strict';
 
 // ===== Version =====
-const VERSION = '1.5.0';
+const VERSION = '1.6.0';
 
 // ===== Constants =====
 const STORAGE_KEY       = 'bunnywalks';
@@ -12,7 +12,8 @@ const INSTALL_DISMISSED = 'bunny-install-dismissed';
 const $ = id => document.getElementById(id);
 
 // ===== Map state =====
-let sightingsMap = null; // active Leaflet instance
+let sightingsMap = null; // active Leaflet instance (summary screen)
+const historyMaps = {};  // Leaflet instances for history cards, keyed by walk id
 
 // ===== DOM refs =====
 const screens = {
@@ -285,6 +286,71 @@ function clearMapInstance() {
   }
 }
 
+function clearHistoryMaps() {
+  for (const id of Object.keys(historyMaps)) {
+    historyMaps[id].remove();
+    delete historyMaps[id];
+  }
+}
+
+function initHistoryMap(walkId) {
+  if (historyMaps[walkId]) return;
+  if (typeof L === 'undefined') return;
+
+  const container = document.getElementById(`history-map-${walkId}`);
+  if (!container) return;
+
+  const walk = loadWalks().find(w => w.id === walkId);
+  if (!walk) return;
+
+  const pins = (walk.sightings || [])
+    .map((s, i) => ({ s, i }))
+    .filter(({ s }) => s.lat != null && s.lng != null);
+
+  if (pins.length === 0) return;
+
+  const map = L.map(container, { zoomControl: true, attributionControl: true });
+
+  const tileStyle = document.documentElement.getAttribute('data-theme') === 'light' ? 'light_all' : 'dark_all';
+  L.tileLayer(`https://{s}.basemaps.cartocdn.com/${tileStyle}/{z}/{x}/{y}{r}.png`, {
+    attribution: '© <a href="https://openstreetmap.org">OSM</a> © <a href="https://carto.com">CARTO</a>',
+    subdomains: 'abcd',
+    maxZoom: 19,
+  }).addTo(map);
+
+  const bounds = [];
+  pins.forEach(({ s, i }) => {
+    const num = i + 1;
+    const icon = L.divIcon({
+      html: `<div class="map-pin">${num}</div>`,
+      className: '',
+      iconSize:   [28, 28],
+      iconAnchor: [14, 14],
+      popupAnchor:[0, -16],
+    });
+    const time = new Date(s.timestamp).toLocaleTimeString('en-US', {
+      hour: 'numeric', minute: '2-digit', second: '2-digit',
+    });
+    L.marker([s.lat, s.lng], { icon })
+      .bindPopup(
+        `<div class="map-popup-num">Sighting #${num}</div><div class="map-popup-time">${time}</div>`,
+        { maxWidth: 160 }
+      )
+      .addTo(map);
+    bounds.push([s.lat, s.lng]);
+  });
+
+  if (bounds.length === 1) {
+    map.setView(bounds[0], 16);
+  } else {
+    map.fitBounds(bounds, { padding: [40, 40], maxZoom: 17 });
+  }
+
+  historyMaps[walkId] = map;
+  // Leaflet needs a size check after the panel becomes visible
+  setTimeout(() => map.invalidateSize(), 50);
+}
+
 function initSightingsMap(sightings) {
   // Leaflet might not be available offline
   if (typeof L === 'undefined') return;
@@ -410,7 +476,29 @@ function clearHistory() {
   );
 }
 
+function deleteWalk(walkId) {
+  showConfirm(
+    'Delete this walk?',
+    'This walk will be permanently deleted.',
+    'Delete',
+    async () => {
+      const walks = loadWalks();
+      const walk = walks.find(w => w.id === walkId);
+      if (walk?.supabaseId && currentUser && navigator.onLine) {
+        try {
+          await supabaseClient.from('walks').delete().eq('id', walk.supabaseId);
+        } catch (err) {
+          console.error('[sync] delete walk failed:', err);
+        }
+      }
+      persistWalks(walks.filter(w => w.id !== walkId));
+      renderHistory();
+    }
+  );
+}
+
 function renderHistory() {
+  clearHistoryMaps();
   const walks = loadWalks();
   const hasWalks = walks.length > 0;
 
@@ -431,8 +519,13 @@ function renderHistory() {
       ? `<span class="sync-dot ${w.synced ? 'synced' : 'local'}" aria-label="${w.synced ? 'Synced to cloud' : 'Local only'}"></span>`
       : '';
 
+    const hasMappableSightings = (w.sightings || []).some(s => s.lat != null && s.lng != null);
+    const mapHTML = hasMappableSightings
+      ? `<div class="history-map-wrap"><div id="history-map-${w.id}" class="history-map"></div><p class="map-caption">tap a pin to see sighting details</p></div>`
+      : '';
+
     return `
-      <div class="walk-card" role="listitem">
+      <div class="walk-card" role="listitem" data-walk-id="${w.id}">
         <button class="walk-card-header" aria-expanded="false" onclick="toggleWalkCard(this)">
           <div class="walk-card-left">
             <span class="walk-card-date">${dateStr}</span>
@@ -445,7 +538,11 @@ function renderHistory() {
           </div>
         </button>
         <div class="walk-card-sightings" hidden>
+          ${mapHTML}
           ${buildSightingsHTML(w.sightings) || '<p class="no-sightings">No sighting details recorded.</p>'}
+          <div class="walk-card-delete">
+            <button class="btn-delete-walk" onclick="deleteWalk('${w.id}')">Delete walk</button>
+          </div>
         </div>
       </div>
     `;
@@ -457,6 +554,11 @@ function toggleWalkCard(btn) {
   const isExpanded = btn.getAttribute('aria-expanded') === 'true';
   btn.setAttribute('aria-expanded', String(!isExpanded));
   panel.hidden = isExpanded;
+
+  if (!isExpanded) {
+    const walkId = btn.closest('.walk-card').dataset.walkId;
+    initHistoryMap(walkId);
+  }
 }
 
 function buildSightingsHTML(sightings) {
