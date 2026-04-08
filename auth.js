@@ -41,7 +41,7 @@ function initAuth(onReady) {
 async function sendMagicLink(email) {
   const { error } = await supabaseClient.auth.signInWithOtp({
     email,
-    options: { emailRedirectTo: window.location.href.split('#')[0] },
+    options: { emailRedirectTo: window.location.origin + '/' },
   });
   return error;
 }
